@@ -84,4 +84,52 @@ Unlike the really good message that appears when running with Playwright:
 
 The code used for this exercise can be found in this commit: https://github.com/rlnsy/cucumber-js-playwright/commit/2749118736fb12634410fffae0a6b35c5a249626
 
-At this time, I do not recommend using this technique for integrating cucumber with Playwright. Without significant configuration, the system is unsuitable for testing and there are many tradeoffs which limit the extent to which Playwright offers value in the testing ecosystem.
+## Fixing the Error Messages
+It looks like the main issue with the error message is because of a timeout. What's happening here is that the default expect timeout in Playwright is 5000ms, but the default step timeout in Cucumber JS is also 5000ms. Therefore, the test times out waiting for the expect to resolve and therefore we never actually get the error message.
+
+The fix to this is to set the default timeout for cucumber to be the same as PLaywright:
+
+```
+const {setDefaultTimeout} = require('@cucumber/cucumber');
+
+setDefaultTimeout(6000);
+```
+
+This gives us the error reporting that we want:
+
+```
+1) Scenario: has title # features/example.feature:5
+   ✔ Before (initialize playwright) # features/support/steps.js:13
+   ✔ When On the playwright page # features/support/steps.js:22
+   ✖ Then The title should be displayed # features/support/steps.js:26
+       Error: Timed out 5000ms waiting for expect(locator).toHaveTitle(expected)
+       
+       Locator: locator(':root')
+       Expected pattern: /Playwrights/
+       Received string:  "Fast and reliable end-to-end testing for modern web apps | Playwright"
+       Call log:
+         - locator._expect with timeout 5000ms
+         - waiting for locator(':root')
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-rh="…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-rh="…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+         -   locator resolved to <html lang="en" dir="ltr" data-theme="light" data-has-…>…</html>
+         -   unexpected value "Fast and reliable end-to-end testing for modern web apps | Playwright"
+       
+           at Proxy.<anonymous> (/Users/rowan/Local/playwright-cucumber/node_modules/playwright/lib/matchers/expect.js:174:37)
+           at World.<anonymous> (/Users/rowan/Local/playwright-cucumber/features/support/steps.js:27:27)
+   ✔ After (shut down playwright) # features/support/steps.js:18
+```

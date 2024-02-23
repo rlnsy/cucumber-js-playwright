@@ -1,6 +1,16 @@
-const { Before, After, When, Then } = require("@cucumber/cucumber");
+const {
+  Before,
+  After,
+  When,
+  Then,
+  setDefaultTimeout,
+} = require("@cucumber/cucumber");
 const { chromium, firefox, webkit } = require("playwright");
 const { expect } = require("@playwright/test");
+
+// should be greater than the sum of playwright timeout for any individual step
+// timeouts for individual steps or hooks can also be set
+setDefaultTimeout(6000);
 
 Before({ name: "initialize playwright" }, async function () {
   this.browser = await chromium.launch({});
