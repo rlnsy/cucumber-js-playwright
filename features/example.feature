@@ -10,5 +10,5 @@ Feature: Playwright Page
 
 		Example: has getting started link
 			When On the playwright page
-			Then The getting started link should be displayed
-			And The installation link should be displayed
+			And The getting started button is clicked
+			Then The installation link should be displayed
