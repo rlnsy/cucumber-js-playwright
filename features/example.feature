@@ -12,3 +12,6 @@ Feature: Playwright Page
 			When On the playwright page
 			And The getting started button is clicked
 			Then The installation link should be displayed
+
+	Scenario: custom fixture info
+		* Get custom fixture info

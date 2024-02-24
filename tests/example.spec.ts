@@ -1,4 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { Fixtures, fixtures } from "./fixtures";
+
+const testWithCustomFixture = test.extend<Fixtures>(fixtures);
 
 test("has title", async ({ page }) => {
   await page.goto("https://playwright.dev/");
@@ -17,4 +20,8 @@ test("get started link", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Installation" }),
   ).toBeVisible();
+});
+
+testWithCustomFixture("get fixture value", ({ myFixture }) => {
+  expect(myFixture).toEqual("hello")
 });
