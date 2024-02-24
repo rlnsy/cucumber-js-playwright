@@ -1,12 +1,12 @@
-const {
+import {
   Before,
   After,
   When,
   Then,
   setDefaultTimeout,
-} = require("@cucumber/cucumber");
-const { chromium, firefox, webkit } = require("playwright");
-const { expect } = require("@playwright/test");
+} from "@cucumber/cucumber";
+import { chromium, firefox, webkit } from "playwright";
+import { expect } from "@playwright/test";
 
 // should be greater than the sum of playwright timeout for any individual step
 // timeouts for individual steps or hooks can also be set
