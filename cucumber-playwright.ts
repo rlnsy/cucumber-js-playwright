@@ -35,10 +35,10 @@ setWorldConstructor(CustomWorld);
 setDefaultTimeout(defaultStepTimeout);
 
 Before({ name: "initialize playwright" }, async function (this: CustomWorld) {
-  const browser = await chromium.launch({}); // TODO: support other browsers
-  const context = await browser.newContext(); // TODO: support shared context? (see https://playwright.dev/docs/api/class-browsercontext)
+  const browser = await chromium.launch({});
+  const context = await browser.newContext();
   const page = await context.newPage();
-  const request = page.request; // TODO
+  const request = page.request;
   this.builtInFixtures = { browser, context, page, request };
 
   // TODO add type safety
@@ -57,7 +57,6 @@ After({ name: "shut down playwright" }, async function (this: CustomWorld) {
 
 // the define step function in cucumber is deprecated, but we redefine it here to use the
 // same logic for all step definition functions
-// TODO: support other arguments to test callback?
 function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs & F & { world: T }) => any | Promise<any>, options: IDefineStepOptions = {}) {
   _When(pattern, {
     timeout: defaultStepTimeout,
