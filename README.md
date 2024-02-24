@@ -22,6 +22,8 @@ await page.goto('http://example.com');
 // other actions...
 ```
 
+Usage of the Library is further described here: https://playwright.dev/docs/library
+
 In cucumber js, we can set this up using some before and after (each) hooks and assigning some values to the World:
 
 ```
