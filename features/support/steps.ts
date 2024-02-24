@@ -1,5 +1,5 @@
 import { expect } from "playwright/test";
-import { Then, When } from "./util";
+import { Then, When } from "../../cucumber-playwright";
 
 When("On the playwright page", async ({ page, world: { foo } }) => {
   await page.goto("https://playwright.dev/");
