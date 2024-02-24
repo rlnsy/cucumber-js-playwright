@@ -1,5 +1,8 @@
 {
   "default": {
+    "formatOptions": {
+      "snippetSyntax": "./cucumber-snippet.js"
+    },
     "requireModule": ["ts-node/register"],
     "require": ["features/support/steps.ts"]
   }

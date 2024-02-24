@@ -62,7 +62,7 @@ function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs 
     timeout: defaultStepTimeout,
     ...options,
   }, async function (this: CustomWorld) {
-    await code({
+    return await code({
       ...this.builtInFixtures,
       ...this.userFixtures,
       world: this.userWorld
@@ -71,6 +71,7 @@ function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs 
 }
 
   return {
+    defineStep,
     Given: defineStep,
     When: defineStep,
     Then: defineStep

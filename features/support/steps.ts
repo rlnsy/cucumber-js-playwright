@@ -2,7 +2,7 @@ import { expect } from "playwright/test";
 import { registerCucumberPlaywright } from "../../cucumber-playwright";
 import { Fixtures, fixtures } from "../../tests/fixtures";
 
-const { Then, When } = registerCucumberPlaywright<{ foo: number }, Fixtures>(() => ({ foo: 1 }), fixtures);
+const { defineStep, Then, When } = registerCucumberPlaywright<{ foo: number }, Fixtures>(() => ({ foo: 1 }), fixtures);
 
 When("On the playwright page", async ({ page, world: { foo } }) => {
   await page.goto("https://playwright.dev/");
@@ -22,8 +22,6 @@ Then("The installation link should be displayed", async ({ page }) => {
   ).toBeVisible();
 });
 
-// TODO: customize snippets to use arrow function
-
-When('Get custom fixture info', ({ myFixture }) => {
+defineStep("Get custom fixture info", async ({ myFixture }) => {
   expect(myFixture).toEqual("hello")
 });
