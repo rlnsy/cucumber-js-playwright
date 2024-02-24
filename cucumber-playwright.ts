@@ -3,16 +3,17 @@ import { DefineStepPattern } from "@cucumber/cucumber/lib/support_code_library_b
 import { APIRequestContext, Browser, BrowserContext, chromium, Page } from "playwright";
 import { PlaywrightTestArgs } from "playwright/test";
 
-type UserWorld = Partial<{ foo: number }>;
+export function registerCucumberPlaywright<T>(worldConstructor: () => T) {
 
 class CustomWorld extends World {
-  userWorld: UserWorld = {};
+  userWorld: T;
   page: Page;
   context: BrowserContext;
   browser: Browser;
   request: APIRequestContext;
   constructor(options: IWorldOptions) {
     super(options);
+    this.userWorld = worldConstructor();
   }
 }
 
@@ -37,12 +38,15 @@ After({ name: "shut down playwright" }, async function (this: CustomWorld) {
 // the define step function in cucumber is deprecated, but we redefine it here to use the
 // same logic for all step definition functions
 // TODO: support other arguments to test callback?
-function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs & { world: UserWorld }) => any | Promise<any>) {
+function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs & { world: T }) => any | Promise<any>) {
   _When(pattern, async function (this: CustomWorld) {
     await code({ page: this.page, context: this.context, request: this.request, world: this.userWorld });
   });
 }
 
-export const Given = defineStep;
-export const When = defineStep;
-export const Then = defineStep;
+  return {
+    Given: defineStep,
+    When: defineStep,
+    Then: defineStep
+  }
+}

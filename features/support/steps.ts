@@ -1,5 +1,7 @@
 import { expect } from "playwright/test";
-import { Then, When } from "../../cucumber-playwright";
+import { registerCucumberPlaywright } from "../../cucumber-playwright";
+
+const { Then, When } = registerCucumberPlaywright(() => ({ foo: 1 }));
 
 When("On the playwright page", async ({ page, world: { foo } }) => {
   await page.goto("https://playwright.dev/");
