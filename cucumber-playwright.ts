@@ -58,14 +58,21 @@ After({ name: "shut down playwright" }, async function (this: CustomWorld) {
 
 // the define step function in cucumber is deprecated, but we redefine it here to use the
 // same logic for all step definition functions
-// TODO validate params
 // TODO infer type of params
 function defineStep(pattern: DefineStepPattern, paramTypes: ZodType[], code: (args: PlaywrightTestArgs & F & { world: T }, ...params: any[]) => any | Promise<any>, options: IDefineStepOptions = {}) {
-  const runUserCode = async (world: CustomWorld, ...params: unknown[]) => code({
-    ...world.builtInFixtures,
-    ...world.userFixtures,
-    world: world.userWorld
-  }, ...params);
+  const runUserCode = async (world: CustomWorld, ...params: unknown[]) => {
+    paramTypes.forEach((type, i) => {
+      const typeResult = type.safeParse(params[i]);
+      if (!typeResult.success) {
+        throw new Error(`Incorrect parameter type at index ${i}`);
+      }
+    });
+    return await code({
+      ...world.builtInFixtures,
+      ...world.userFixtures,
+      world: world.userWorld
+    }, ...params);
+  }
   const paramArgs = paramTypes.map((_, i) => `param${i}`);
   const handler = new Function(
     "fn",
