@@ -1,7 +1,8 @@
-import { When as _When, After, Before, IWorldOptions, setDefaultTimeout, setWorldConstructor, World } from "@cucumber/cucumber";
+import { When, After, Before, IWorldOptions, setDefaultTimeout, setWorldConstructor, World } from "@cucumber/cucumber";
 import { DefineStepPattern, IDefineStepOptions } from "@cucumber/cucumber/lib/support_code_library_builder/types";
 import { APIRequestContext, Browser, BrowserContext, chromium, Page } from "playwright";
 import { PlaywrightTestArgs } from "playwright/test";
+import { ZodType } from "zod";
 
 export type FixtureInitializer<F> = { [k in keyof F]: (args: PlaywrightTestArgs, use: (value: F[k]) => Promise<void>) => Promise<void> };
 
@@ -57,17 +58,23 @@ After({ name: "shut down playwright" }, async function (this: CustomWorld) {
 
 // the define step function in cucumber is deprecated, but we redefine it here to use the
 // same logic for all step definition functions
-function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs & F & { world: T }) => any | Promise<any>, options: IDefineStepOptions = {}) {
-  _When(pattern, {
+// TODO validate params
+// TODO infer type of params
+function defineStep(pattern: DefineStepPattern, paramTypes: ZodType[], code: (args: PlaywrightTestArgs & F & { world: T }, ...params: any[]) => any | Promise<any>, options: IDefineStepOptions = {}) {
+  const runUserCode = async (world: CustomWorld, ...params: unknown[]) => code({
+    ...world.builtInFixtures,
+    ...world.userFixtures,
+    world: world.userWorld
+  }, ...params);
+  const paramArgs = paramTypes.map((_, i) => `param${i}`);
+  const handler = new Function(
+    "fn",
+    `return async function (${paramArgs.join(",")}) { return await fn(${["this", ...paramArgs].join(",")}) }`,
+  )(runUserCode);
+  When(pattern, {
     timeout: defaultStepTimeout,
     ...options,
-  }, async function (this: CustomWorld) {
-    return await code({
-      ...this.builtInFixtures,
-      ...this.userFixtures,
-      world: this.userWorld
-    });
-  });
+  }, handler as any);
 }
 
   return {

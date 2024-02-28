@@ -4,7 +4,7 @@ Feature: Playwright Page
 
 		Example: has title
 			When On the playwright page
-			Then The title should be displayed
+			Then The title 'Playwrights' should be displayed
 
 	Rule: It has the getting started link
 

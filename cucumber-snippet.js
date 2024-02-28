@@ -4,7 +4,10 @@ function SnippetSyntax() {
             if (opts.generatedExpressions.length > 1) {
                 throw new Error("sorry, I can't generate snippets for more than one cucumber expression");
             }
-            const { expressionTemplate } = opts.generatedExpressions[0];
+            let { expressionTemplate, parameterTypes } = opts.generatedExpressions[0];
+            parameterTypes.forEach(({ name }, i) => {
+                expressionTemplate = expressionTemplate.replace(new RegExp(`\\{${i}\\}`, "g"), name);
+            })
             return `
             defineStep("${expressionTemplate}", async ({ }) => {
                 // ${opts.comment}
