@@ -35,7 +35,9 @@ setWorldConstructor(CustomWorld);
 setDefaultTimeout(defaultStepTimeout);
 
 Before({ name: "initialize playwright" }, async function (this: CustomWorld) {
-  const browser = await chromium.launch({});
+  const browser = await chromium.launch({
+    headless: true
+  });
   const context = await browser.newContext();
   const page = await context.newPage();
   const request = page.request;
