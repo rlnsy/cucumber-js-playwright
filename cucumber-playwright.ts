@@ -28,18 +28,28 @@ export type FixtureInitializer<F> = {
 };
 
 /**
- * Set up cucumber-js with the Playwright integration, returning the bound
- * step definition functions.
- * @param worldConstructor Function that initializes the world and can be used to infer world type.
- * @param fixtures Object containing functions for initializing fixtures, as passed to `test.extend`.
- * @param defaultStepTimeout Default timeout for each cucumber step. It should be greater than the sum of playwright timeouts for any individual step. Timeouts for individual steps or hooks can also be set by passing timeout option.
- * @returns
+ * Set up cucumber-js with the Playwright integration, returning the bound step definition functions.
+ *
+ * @param worldConstructor
+ * Function that initializes the world and can be used
+ * to infer world type.
+ *
+ * @param fixtures
+ * Object containing functions for initializing fixtures, as passed to `test.extend`.
+ *
+ * @param defaultStepTimeout
+ * Default timeout for each cucumber step. It should be greater than the sum of playwright timeouts for any individual step. Timeouts for individual steps or hooks can also be set by passing timeout option.
+ *
+ * @returns The step definition functions (Given, When, Then).
  */
 export function registerCucumberPlaywright<T, F>(
   worldConstructor: () => T,
   fixtures: FixtureInitializer<F>,
   defaultStepTimeout = 6000
 ) {
+  // define custom world data type for cucumber to manage
+  // This includes the world used in the step logic as
+  // well as Playwright fixtures
   class CustomWorld extends World {
     userWorld: T;
     userFixtures: F;
@@ -57,18 +67,24 @@ export function registerCucumberPlaywright<T, F>(
 
   setWorldConstructor(CustomWorld);
 
+  // set default timeout for cucumber step runner
   setDefaultTimeout(defaultStepTimeout);
 
+  // Run Playwright initialization routine before each test
   Before({ name: "initialize playwright" }, async function (this: CustomWorld) {
+    // create the browser, context, page, and request context using
+    // the Playwright Library
     const browser = await chromium.launch({
       headless: true,
     });
     const context = await browser.newContext();
     const page = await context.newPage();
     const request = page.request;
+
+    // store references to the built in fixtures (TestArgs)
     this.builtInFixtures = { browser, context, page, request };
 
-    // TODO add type safety
+    // create user-defined fixtures
     this.userFixtures = {} as F;
     Object.entries(fixtures).forEach(async ([name, initFixture]) => {
       let value: any;
@@ -79,11 +95,13 @@ export function registerCucumberPlaywright<T, F>(
     });
   });
 
+  // Clean up the browser and context after each test
   After({ name: "shut down playwright" }, async function (this: CustomWorld) {
     await this.builtInFixtures.context.close();
     await this.builtInFixtures.browser.close();
   });
 
+  // create the step definition function
   function defineStep(
     pattern: DefineStepPattern,
     code: (
@@ -92,6 +110,7 @@ export function registerCucumberPlaywright<T, F>(
     ) => any | Promise<any>,
     options: IDefineStepOptions = {}
   ) {
+    // wrap step handler to convert internal world data into the user consumed structure.
     const runUserCode = async (world: CustomWorld, ...params: unknown[]) => {
       return await code(
         {
@@ -102,10 +121,21 @@ export function registerCucumberPlaywright<T, F>(
         ...params
       );
     };
+
+    // derive step handler arity from the provided function
     const numParams = code.length - 1;
+
+    // Next we need to generate a function using the function constructor
+    // since cucumber will not allow variadic functions as step definition
+    // handlers.
+
+    // create parameter expression
     const paramArgs = Array.from(Array(numParams).keys()).map(
       (i) => `param${i}`
     );
+
+    // create handler function by binding the user code routine
+    // to a dynamically created function factory
     const handler = new Function(
       "fn",
       `return async function (${paramArgs.join(",")}) { return await fn(${[
@@ -113,6 +143,8 @@ export function registerCucumberPlaywright<T, F>(
         ...paramArgs,
       ].join(",")}) }`
     )(runUserCode);
+
+    // register the step definition
     When(
       pattern,
       {
