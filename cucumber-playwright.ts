@@ -2,7 +2,6 @@ import { When, After, Before, IWorldOptions, setDefaultTimeout, setWorldConstruc
 import { DefineStepPattern, IDefineStepOptions } from "@cucumber/cucumber/lib/support_code_library_builder/types";
 import { APIRequestContext, Browser, BrowserContext, chromium, Page } from "playwright";
 import { PlaywrightTestArgs } from "playwright/test";
-import { ZodType } from "zod";
 
 export type FixtureInitializer<F> = { [k in keyof F]: (args: PlaywrightTestArgs, use: (value: F[k]) => Promise<void>) => Promise<void> };
 
@@ -59,7 +58,7 @@ After({ name: "shut down playwright" }, async function (this: CustomWorld) {
 // the define step function in cucumber is deprecated, but we redefine it here to use the
 // same logic for all step definition functions
 // TODO: figure out how to get type safety
-function defineStep(pattern: DefineStepPattern, numParams: number, code: (args: PlaywrightTestArgs & F & { world: T }, ...params: any[]) => any | Promise<any>, options: IDefineStepOptions = {}) {
+function defineStep(pattern: DefineStepPattern, code: (args: PlaywrightTestArgs & F & { world: T }, ...params: any[]) => any | Promise<any>, options: IDefineStepOptions = {}) {
   const runUserCode = async (world: CustomWorld, ...params: unknown[]) => {
     return await code({
       ...world.builtInFixtures,
@@ -67,6 +66,7 @@ function defineStep(pattern: DefineStepPattern, numParams: number, code: (args: 
       world: world.userWorld
     }, ...params);
   }
+  const numParams = code.length - 1;
   const paramArgs = Array.from(Array(numParams).keys()).map((i) => `param${i}`);
   const handler = new Function(
     "fn",
