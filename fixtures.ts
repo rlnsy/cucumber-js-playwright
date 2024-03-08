@@ -1,9 +1,10 @@
+import { APIRequestContext } from "playwright";
 import { FixtureInitializer } from "./cucumber-playwright";
 
-export type Fixtures = { myFixture: string };
+export type Fixtures = { myCustomRequestContext: APIRequestContext };
 
 export const fixtures: FixtureInitializer<Fixtures> = {
-  myFixture: async ({ page }, use) => {
-    await use("hello");
+  myCustomRequestContext: async ({ request }, use) => {
+    await use(request);
   },
 };

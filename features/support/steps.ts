@@ -22,12 +22,8 @@ Then("The installation link should be displayed", async ({ page }) => {
   ).toBeVisible();
 });
 
-Then('Get custom fixture info', ({ myFixture }) => {
-  expect(myFixture).toEqual("hello")
-});
-
-Then('make an API request', async ({ request }) => {
-  const response = await request.get('https://jsonplaceholder.typicode.com/todos/1');
+Then('make an API request', async ({ myCustomRequestContext }) => {
+  const response = await myCustomRequestContext.get('https://jsonplaceholder.typicode.com/todos/1');
   expect(await response.json()).toEqual(expect.objectContaining({
     userId: 1
   }));

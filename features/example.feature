@@ -13,8 +13,5 @@ Feature: Playwright Page
 			And The getting started button is clicked
 			Then The installation link should be displayed
 
-	Scenario: custom fixture info
-		* Get custom fixture info
-
 	Scenario: API request
 		* make an API request
