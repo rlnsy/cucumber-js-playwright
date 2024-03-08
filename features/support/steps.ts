@@ -2,9 +2,15 @@ import { expect } from "playwright/test";
 import { registerCucumberPlaywright } from "../../cucumber-playwright";
 import { Fixtures, fixtures } from "../../fixtures";
 
-const { Then, When } = registerCucumberPlaywright<{ foo: number }, Fixtures>(() => ({ foo: 1 }), fixtures);
+type WorldType = {
+  myCount: number;
+};
 
-When("On the playwright page", async ({ page, world: { foo } }) => {
+const initialWorld: WorldType = { myCount: 0 };
+
+const { Then, When } = registerCucumberPlaywright<WorldType, Fixtures>(() => initialWorld, fixtures);
+
+When("On the playwright page", async ({ page, world }) => {
   await page.goto("https://playwright.dev/");
 });
 
@@ -28,3 +34,11 @@ Then('make an API request', async ({ myCustomRequestContext }) => {
     userId: 1
   }));
 })
+
+When('the count is incremented', ({ world }) => {
+  world.myCount++;
+});
+
+Then('the count is {int}', ({ world: { myCount } }, count: number) => {
+  expect(myCount).toEqual(count);
+});

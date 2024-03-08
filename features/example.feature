@@ -13,5 +13,9 @@ Feature: Playwright Page
 			And The getting started button is clicked
 			Then The installation link should be displayed
 
+	Scenario: use the world
+		When the count is incremented
+		Then the count is 1
+
 	Scenario: API request
 		* make an API request
