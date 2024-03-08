@@ -25,3 +25,10 @@ Then("The installation link should be displayed", async ({ page }) => {
 defineStep("Get custom fixture info", async ({ myFixture }) => {
   expect(myFixture).toEqual("hello")
 });
+
+defineStep("make an API request", async ({ request }) => {
+  const response = await request.get('https://jsonplaceholder.typicode.com/todos/1');
+  expect(await response.json()).toEqual(expect.objectContaining({
+    userId: 1
+  }));
+});

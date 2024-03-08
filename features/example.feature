@@ -15,3 +15,6 @@ Feature: Playwright Page
 
 	Scenario: custom fixture info
 		* Get custom fixture info
+
+	Scenario: API request
+		* make an API request

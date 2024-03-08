@@ -25,3 +25,10 @@ test("get started link", async ({ page }) => {
 testWithCustomFixture("get fixture value", ({ myFixture }) => {
   expect(myFixture).toEqual("hello")
 });
+
+test("API request", async ({ request }) => {
+  const response = await request.get('https://jsonplaceholder.typicode.com/todos/1');
+  expect(await response.json()).toEqual(expect.objectContaining({
+    userId: 1
+  }));
+});
