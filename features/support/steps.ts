@@ -1,6 +1,6 @@
 import { expect } from "playwright/test";
 import { registerCucumberPlaywright } from "../../cucumber-playwright";
-import { Fixtures, fixtures } from "../../tests/fixtures";
+import { Fixtures, fixtures } from "../../fixtures";
 
 const { defineStep, Then, When } = registerCucumberPlaywright<{ foo: number }, Fixtures>(() => ({ foo: 1 }), fixtures);
 

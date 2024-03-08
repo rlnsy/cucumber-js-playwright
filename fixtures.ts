@@ -1,4 +1,4 @@
-import { FixtureInitializer } from "../cucumber-playwright";
+import { FixtureInitializer } from "./cucumber-playwright";
 
 export type Fixtures = { myFixture: string };
 
