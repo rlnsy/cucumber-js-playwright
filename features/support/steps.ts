@@ -22,6 +22,9 @@ Then("The installation link should be displayed", async ({ page }) => {
   ).toBeVisible();
 });
 
+/**
+ * Note: using defineStep does not link to feature file using VSCode extension.
+ */
 defineStep("Get custom fixture info", async ({ myFixture }) => {
   expect(myFixture).toEqual("hello")
 });
