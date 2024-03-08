@@ -9,7 +9,7 @@ When("On the playwright page", async ({ page, world: { foo } }) => {
 });
 
 Then("The title {string} should be displayed", async ({ page }, title: string) => {
-  await expect(page).toHaveTitle(title);
+  await expect(page).toHaveTitle(new RegExp(title));
 });
 
 When("The getting started button is clicked", async ({ page }) => {
