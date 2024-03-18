@@ -8,7 +8,7 @@ It works really well with the official VSCode extension: https://marketplace.vis
 
 Run tests with
 ```
-npx cucumber-js
+npm t
 ```
 
 The biggest downside of this setup is that the graphical playwright runner cannot be used.
