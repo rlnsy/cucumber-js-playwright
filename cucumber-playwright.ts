@@ -30,23 +30,28 @@ export type FixtureInitializer<F> = {
   ) => Promise<void>;
 };
 
+const environmentBoolean = zod.union(
+  [zod.literal("true"), zod.literal("false")]
+);
+
 const environmentSchema = zod.object({
   // BUILT IN
-  CUCUMBER_PARALLEL: zod.unknown(),
-  CUCUMBER_TOTAL_WORKERS: zod.unknown(),
-  CUCUMBER_WORKER_ID: zod.unknown(),
+  CUCUMBER_PARALLEL: environmentBoolean.transform((val) => val !== "false"),
+  CUCUMBER_TOTAL_WORKERS: zod.string().transform((val) => parseInt(val)),
+  CUCUMBER_WORKER_ID: zod.string().transform((val) => parseInt(val)),
 
   // CUSTOM
-  CUCUMBER_PLAYWRIGHT_HEADLESS: zod.union(
-    [zod.literal("true"), zod.literal("false")]
-  ).optional()
+  CUCUMBER_PLAYWRIGHT_HEADLESS: environmentBoolean.optional()
+    .transform((val) => {
+      return val !== "false" // default to true
+    }),
 });
-
-export type CucumberPlaywrightEnv = zod.infer<typeof environmentSchema>;
 
 function getEnvironment() {
   return environmentSchema.parse(process.env);
 }
+
+export type CucumberPlaywrightEnv = ReturnType<typeof getEnvironment>;
 
 // stored globally for this worker
 let browser: Browser;
@@ -97,7 +102,7 @@ export function registerCucumberPlaywright<T, F>(
   BeforeAll(async () => {
     env = getEnvironment();
     browser = await webkit.launch({
-      headless: env.CUCUMBER_PLAYWRIGHT_HEADLESS !== "false", // default to true
+      headless: env.CUCUMBER_PLAYWRIGHT_HEADLESS
     });
   });
 
