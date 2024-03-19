@@ -6,6 +6,8 @@ import {
   setDefaultTimeout,
   setWorldConstructor,
   World,
+  AfterAll,
+  BeforeAll,
 } from "@cucumber/cucumber";
 import {
   DefineStepPattern,
@@ -15,7 +17,7 @@ import {
   APIRequestContext,
   Browser,
   BrowserContext,
-  chromium,
+  webkit,
   Page,
 } from "playwright";
 import { PlaywrightTestArgs } from "playwright/test";
@@ -26,6 +28,9 @@ export type FixtureInitializer<F> = {
     use: (value: F[k]) => Promise<void>
   ) => Promise<void>;
 };
+
+// browser is stored globally for this worker
+let browser: Browser;
 
 /**
  * Set up cucumber-js with the Playwright integration, returning the bound step definition functions.
@@ -70,13 +75,16 @@ export function registerCucumberPlaywright<T, F>(
   // set default timeout for cucumber step runner
   setDefaultTimeout(defaultStepTimeout);
 
+  BeforeAll(async () => {
+    browser = await webkit.launch({
+      headless: false,
+    });
+  });
+
   // Run Playwright initialization routine before each test
   Before({ name: "initialize playwright" }, async function (this: CustomWorld) {
     // create the browser, context, page, and request context using
     // the Playwright Library
-    const browser = await chromium.launch({
-      headless: true,
-    });
     const context = await browser.newContext();
     const page = await context.newPage();
     const request = page.request;
@@ -98,7 +106,10 @@ export function registerCucumberPlaywright<T, F>(
   // Clean up the browser and context after each test
   After({ name: "shut down playwright" }, async function (this: CustomWorld) {
     await this.builtInFixtures.context.close();
-    await this.builtInFixtures.browser.close();
+  });
+
+  AfterAll(async () => {
+    await browser.close();
   });
 
   // create the step definition function

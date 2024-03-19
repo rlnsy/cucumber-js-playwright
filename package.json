@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "cucumber-js"
+    "test": "cucumber-js --parallel 2"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^10.3.1",
