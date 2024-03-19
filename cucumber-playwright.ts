@@ -185,7 +185,6 @@ export function registerCucumberPlaywright<T, F>(
   }
 
   return {
-    defineStep,
     Given: defineStep,
     When: defineStep,
     Then: defineStep,

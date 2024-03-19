@@ -9,7 +9,7 @@ function SnippetSyntax() {
                 expressionTemplate = expressionTemplate.replace(new RegExp(`\\{${i}\\}`, "g"), name);
             })
             return `
-            defineStep("${expressionTemplate}", async ({ }) => {
+            ${opts.functionName}("${expressionTemplate}", async ({ }) => {
                 // ${opts.comment}
                 return "pending";
             });

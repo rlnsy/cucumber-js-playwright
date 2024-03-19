@@ -7,7 +7,7 @@ type WorldType = {
 
 const initialWorld: WorldType = { myCount: 0 };
 
-export const { Then, When, defineStep } = registerCucumberPlaywright<WorldType, Fixtures>(
+export const { Given, When, Then } = registerCucumberPlaywright<WorldType, Fixtures>(
   () => initialWorld,
   fixtures
 );
