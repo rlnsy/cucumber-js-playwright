@@ -22,3 +22,6 @@ Feature: Playwright Page
 
 	Scenario: Create a new page in the test
 		* create a new page in the test
+
+	Scenario: Access environment variables
+		* access environment variable in the test

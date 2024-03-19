@@ -14,3 +14,7 @@ Given("create a new page in the test", async ({ context }) => {
   // this creates a second window attached to the same browser instance
   // to see it for yourself, add some wait and run in headed mode
 });
+
+Given("access environment variable in the test", async ({ env }) => {
+  expect(env.CUCUMBER_WORKER_ID).toBeDefined();
+});

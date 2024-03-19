@@ -42,13 +42,15 @@ const environmentSchema = zod.object({
   ).optional()
 });
 
+export type CucumberPlaywrightEnv = zod.infer<typeof environmentSchema>;
+
 function getEnvironment() {
   return environmentSchema.parse(process.env);
 }
 
 // stored globally for this worker
 let browser: Browser;
-let env: zod.infer<typeof environmentSchema>;
+let env: CucumberPlaywrightEnv;
 
 /**
  * Set up cucumber-js with the Playwright integration, returning the bound step definition functions.
@@ -134,7 +136,7 @@ export function registerCucumberPlaywright<T, F>(
   function defineStep(
     pattern: DefineStepPattern,
     code: (
-      args: PlaywrightTestArgs & F & { world: T },
+      args: PlaywrightTestArgs & F & { world: T } & { env: CucumberPlaywrightEnv },
       ...params: any[]
     ) => any | Promise<any>,
     options: IDefineStepOptions = {}
@@ -146,6 +148,7 @@ export function registerCucumberPlaywright<T, F>(
           ...world.builtInFixtures,
           ...world.userFixtures,
           world: world.userWorld,
+          env,
         },
         ...params
       );
