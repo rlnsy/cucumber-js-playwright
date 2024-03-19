@@ -79,7 +79,6 @@ export function registerCucumberPlaywright<T, F>(
     builtInFixtures: {
       page: Page;
       context: BrowserContext;
-      browser: Browser;
       request: APIRequestContext;
     };
     constructor(options: IWorldOptions) {
@@ -109,7 +108,7 @@ export function registerCucumberPlaywright<T, F>(
     const request = page.request;
 
     // store references to the built in fixtures (TestArgs)
-    this.builtInFixtures = { browser, context, page, request };
+    this.builtInFixtures = { context, page, request };
 
     // create user-defined fixtures
     this.userFixtures = {} as F;
