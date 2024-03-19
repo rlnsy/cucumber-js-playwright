@@ -4,6 +4,6 @@
       "snippetSyntax": "./cucumber-snippet.js"
     },
     "requireModule": ["ts-node/register"],
-    "require": ["features/support/steps.ts"]
+    "require": ["features/support/steps/*.steps.ts"]
   }
 }
