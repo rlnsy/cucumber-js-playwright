@@ -21,6 +21,7 @@ import {
   Page,
 } from "playwright";
 import { PlaywrightTestArgs } from "playwright/test";
+import * as zod from "zod";
 
 export type FixtureInitializer<F> = {
   [k in keyof F]: (
@@ -29,8 +30,25 @@ export type FixtureInitializer<F> = {
   ) => Promise<void>;
 };
 
-// browser is stored globally for this worker
+const environmentSchema = zod.object({
+  // BUILT IN
+  CUCUMBER_PARALLEL: zod.unknown(),
+  CUCUMBER_TOTAL_WORKERS: zod.unknown(),
+  CUCUMBER_WORKER_ID: zod.unknown(),
+
+  // CUSTOM
+  CUCUMBER_PLAYWRIGHT_HEADLESS: zod.union(
+    [zod.literal("true"), zod.literal("false")]
+  ).optional()
+});
+
+function getEnvironment() {
+  return environmentSchema.parse(process.env);
+}
+
+// stored globally for this worker
 let browser: Browser;
+let env: zod.infer<typeof environmentSchema>;
 
 /**
  * Set up cucumber-js with the Playwright integration, returning the bound step definition functions.
@@ -76,8 +94,9 @@ export function registerCucumberPlaywright<T, F>(
   setDefaultTimeout(defaultStepTimeout);
 
   BeforeAll(async () => {
+    env = getEnvironment();
     browser = await webkit.launch({
-      headless: false,
+      headless: env.CUCUMBER_PLAYWRIGHT_HEADLESS !== "false", // default to true
     });
   });
 

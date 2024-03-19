@@ -8,7 +8,7 @@ type WorldType = {
 
 const initialWorld: WorldType = { myCount: 0 };
 
-const { Then, When } = registerCucumberPlaywright<WorldType, Fixtures>(
+const { Then, When, defineStep } = registerCucumberPlaywright<WorldType, Fixtures>(
   () => initialWorld,
   fixtures
 );
@@ -51,4 +51,10 @@ When("the count is incremented", ({ world }) => {
 
 Then("the count is {int}", ({ world: { myCount } }, count: number) => {
   expect(myCount).toEqual(count);
+});
+
+defineStep("create a new page in the test", async ({ context }) => {
+  const secondPage = await context.newPage();
+  // this creates a second window attached to the same browser instance
+  // to see it for yourself, add some wait and run in headed mode
 });

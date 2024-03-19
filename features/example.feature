@@ -19,3 +19,6 @@ Feature: Playwright Page
 
 	Scenario: API request
 		* make an API request
+
+	Scenario: Create a new page in the test
+		* create a new page in the test
